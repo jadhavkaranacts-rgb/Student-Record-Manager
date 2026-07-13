@@ -1,0 +1,2 @@
+- [Radix Select + react-hook-form async reset](radix-select-async-reset.md) — Select shows placeholder even though field.value is correct after form.reset() with async-loaded data; fix with a `key` prop.
+- [Orval/zod codegen pitfalls in this workspace](orval-zod-codegen-pitfalls.md) — format:email and multipart file bodies break codegen with pinned zod v3.25.76; format:date coerces to Date but Drizzle date columns are strings.

@@ -3,13 +3,17 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Student Management System API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: students
+    description: Student management operations
+  - name: activity
+    description: Activity log operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,215 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /students:
+    get:
+      operationId: listStudents
+      tags: [students]
+      summary: List students
+      description: Fetch all students with optional search, filters, and pagination
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Free-text search across name, admission number, and email
+        - name: course
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: gender
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Gender"
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [name, admissionNumber, course, year, createdAt]
+        - name: sortOrder
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        "200":
+          description: List of students
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentListResponse"
+    post:
+      operationId: createStudent
+      tags: [students]
+      summary: Add a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /students/{id}:
+    get:
+      operationId: getStudent
+      tags: [students]
+      summary: Fetch a single student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateStudent
+      tags: [students]
+      summary: Update an existing student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudentUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteStudent
+      tags: [students]
+      summary: Drop (delete) a student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /students/analytics/summary:
+    get:
+      operationId: getStudentAnalytics
+      tags: [students]
+      summary: Student analytics summary
+      description: Aggregate counts of students by course, year, and gender for dashboard widgets
+      responses:
+        "200":
+          description: Analytics summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentAnalytics"
+
+  /activity-logs:
+    get:
+      operationId: listActivityLogs
+      tags: [activity]
+      summary: List recent activity logs
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        "200":
+          description: List of activity log entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityLogListResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +247,215 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    Gender:
+      type: string
+      enum: [Male, Female, Other]
+
+    Student:
+      type: object
+      required:
+        - id
+        - admissionNumber
+        - name
+        - course
+        - year
+        - dateOfBirth
+        - email
+        - mobileNumber
+        - gender
+        - address
+        - photoUrl
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+        admissionNumber:
+          type: string
+        name:
+          type: string
+        course:
+          type: string
+        year:
+          type: integer
+        dateOfBirth:
+          type: string
+          format: date
+        email:
+          type: string
+        mobileNumber:
+          type: string
+        gender:
+          $ref: "#/components/schemas/Gender"
+        address:
+          type: string
+        photoUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    StudentInput:
+      type: object
+      required:
+        - name
+        - course
+        - year
+        - dateOfBirth
+        - email
+        - mobileNumber
+        - gender
+        - address
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        course:
+          type: string
+          minLength: 1
+          maxLength: 100
+        year:
+          type: integer
+          minimum: 1
+          maximum: 8
+        dateOfBirth:
+          type: string
+          format: date
+        email:
+          type: string
+          minLength: 3
+          maxLength: 150
+        mobileNumber:
+          type: string
+          minLength: 7
+          maxLength: 20
+        gender:
+          $ref: "#/components/schemas/Gender"
+        address:
+          type: string
+          minLength: 1
+          maxLength: 500
+        photoUrl:
+          type: ["string", "null"]
+
+    StudentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+        course:
+          type: string
+          minLength: 1
+          maxLength: 100
+        year:
+          type: integer
+          minimum: 1
+          maximum: 8
+        dateOfBirth:
+          type: string
+          format: date
+        email:
+          type: string
+          minLength: 3
+          maxLength: 150
+        mobileNumber:
+          type: string
+          minLength: 7
+          maxLength: 20
+        gender:
+          $ref: "#/components/schemas/Gender"
+        address:
+          type: string
+          minLength: 1
+          maxLength: 500
+        photoUrl:
+          type: ["string", "null"]
+
+    StudentListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Student"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+
+    StudentAnalytics:
+      type: object
+      required: [totalStudents, byCourse, byYear, byGender]
+      properties:
+        totalStudents:
+          type: integer
+        byCourse:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountBucket"
+        byYear:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountBucket"
+        byGender:
+          type: array
+          items:
+            $ref: "#/components/schemas/CountBucket"
+
+    CountBucket:
+      type: object
+      required: [label, count]
+      properties:
+        label:
+          type: string
+        count:
+          type: integer
+
+    ActivityLog:
+      type: object
+      required: [id, action, entityType, entityId, description, createdAt]
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+        entityType:
+          type: string
+        entityId:
+          type: ["integer", "null"]
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ActivityLogListResponse:
+      type: object
+      required: [data, total, page, pageSize]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityLog"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
