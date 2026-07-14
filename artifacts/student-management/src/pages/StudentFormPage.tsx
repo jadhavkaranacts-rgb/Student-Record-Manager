@@ -30,6 +30,7 @@ import {
 } from "@workspace/api-client-react";
 import { studentSchema, StudentFormValues } from "@/lib/schemas";
 import { usePhotoUpload } from "@/hooks/use-photo-upload";
+import { getPhotoSrc } from "@/lib/utils";
 
 export default function StudentFormPage() {
   const params = useParams();
@@ -389,13 +390,13 @@ export default function StudentFormPage() {
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle>Student Photo</CardTitle>
-                <CardDescription>Official ID photograph. DEBUG:[{String(currentPhotoUrl)}]</CardDescription>
+                <CardDescription>Official ID photograph.</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
                 <div className="relative group mb-6">
-                  <Avatar key={currentPhotoUrl || "no-photo"} className="w-48 h-48 border-4 border-background shadow-md">
+                  <Avatar className="w-48 h-48 border-4 border-background shadow-md">
                     {currentPhotoUrl ? (
-                      <AvatarImage src={currentPhotoUrl} alt="Student photo" className="object-cover" />
+                      <AvatarImage src={getPhotoSrc(currentPhotoUrl)} alt="Student photo" className="object-cover" />
                     ) : null}
                     <AvatarFallback className="bg-muted text-muted-foreground text-4xl">
                       {currentName ? currentName.substring(0, 2).toUpperCase() : <User className="w-16 h-16 opacity-50" />}

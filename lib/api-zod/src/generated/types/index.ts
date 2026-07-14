@@ -21,3 +21,5 @@ export * from './studentAnalytics';
 export * from './studentInput';
 export * from './studentListResponse';
 export * from './studentUpdate';
+export * from './uploadUrlRequest';
+export * from './uploadUrlResponse';

@@ -6,7 +6,6 @@ import {
   UpdateStudentBody,
   ListStudentsQueryParams,
 } from "@workspace/api-zod";
-import { uploadPhoto } from "../lib/uploads";
 import { recordActivity } from "../lib/activityLog";
 
 const router: IRouter = Router();
@@ -256,14 +255,6 @@ router.delete("/students/:id", async (req, res) => {
   );
 
   res.status(204).send();
-});
-
-router.post("/students/upload-photo", uploadPhoto.single("photo"), (req, res) => {
-  if (!req.file) {
-    res.status(400).json({ error: "No photo file provided" });
-    return;
-  }
-  res.json({ photoUrl: `/api/uploads/${req.file.filename}` });
 });
 
 export default router;

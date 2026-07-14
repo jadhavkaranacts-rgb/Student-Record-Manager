@@ -37,6 +37,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getPhotoSrc } from "@/lib/utils";
 
 export default function StudentsList() {
   const [, setLocation] = useLocation();
@@ -225,7 +226,7 @@ export default function StudentsList() {
                       <div className="flex items-center gap-3">
                         <Avatar className="w-10 h-10 border shadow-sm">
                           {student.photoUrl ? (
-                            <AvatarImage src={student.photoUrl} alt={student.name} className="object-cover" />
+                            <AvatarImage src={getPhotoSrc(student.photoUrl)} alt={student.name} className="object-cover" />
                           ) : null}
                           <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {student.name.substring(0, 2).toUpperCase()}
