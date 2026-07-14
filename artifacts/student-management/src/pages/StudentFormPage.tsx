@@ -389,11 +389,11 @@ export default function StudentFormPage() {
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle>Student Photo</CardTitle>
-                <CardDescription>Official ID photograph.</CardDescription>
+                <CardDescription>Official ID photograph. DEBUG:[{String(currentPhotoUrl)}]</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
                 <div className="relative group mb-6">
-                  <Avatar className="w-48 h-48 border-4 border-background shadow-md">
+                  <Avatar key={currentPhotoUrl || "no-photo"} className="w-48 h-48 border-4 border-background shadow-md">
                     {currentPhotoUrl ? (
                       <AvatarImage src={currentPhotoUrl} alt="Student photo" className="object-cover" />
                     ) : null}
